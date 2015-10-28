@@ -1,18 +1,72 @@
+/* global MYAPP */
 describe('DIY', function () {
 
 	describe('define()', function () {
 
-		it('should add to the namespace', function () {
-			var myModule;
+		describe('if the application has not been initialized', function () {
 
-			DIY.define('MYAPP.modules.moduleA', function () {
-				return {
-					attr: 'module1'
-				};
+			it('should throw an exception', function () {
+				expect(function () {
+					DIY.define('MYAPP.modules.moduleA', function () {});
+				}).toThrow('App not initialized. Please call DIY.init with proper params');
+			});
+		});
+
+		describe('when the application has been initialized', function () {
+
+			var jsPath;
+
+			beforeEach(function () {
+				jsPath = 'http://localhost/myjsPath/';
+
+				DIY.init({
+					jsPath: jsPath
+				});
 			});
 
-			myModule = new MYAPP.modules.moduleA();
-			expect(myModule.attr).toBe('module1');
+			it('should add to the namespace', function () {
+				var myModule;
+
+				DIY.define('MYAPP.modules.moduleA', [], function () {
+					return {
+						attr: 'module1'
+					};
+				});
+
+				myModule = new MYAPP.modules.moduleA();
+				expect(myModule.attr).toBe('module1');
+
+				DIY.define('MYAPP.modules.moduleB', [], function () {
+					return {
+						attr: 'module2'
+					};
+				});
+
+				myModule = new MYAPP.modules.moduleB();
+				expect(myModule.attr).toBe('module2');
+			});
+
+			describe('if some dependencies are required', function () {
+
+				it('should load the required dependency', function () {
+					var head = {
+							appendChild: jasmine.createSpy()
+						},
+						args;
+
+					spyOn(document, 'getElementsByTagName').and.returnValue([head]);
+
+					DIY.define('MYAPP.modules.moduleB', ['MYAPP.modules.moduleA'], function () {
+						return {};
+					});
+
+					args = head.appendChild.calls.mostRecent().args[0];
+
+					expect(args.childElementCount).toEqual(1);
+					expect(args.childNodes[0].src).toEqual(jsPath + 'modules/moduleA.js');
+					expect(args.childNodes[0].type).toEqual('text/javascript');
+				});
+			});
 		});
 	});
 });
