@@ -52,19 +52,22 @@ describe('DIY', function () {
 
 			describe('if some dependencies are required', function () {
 
+				var head;
+
+				beforeEach(function () {
+					head = {
+						appendChild: jasmine.createSpy()
+					};
+
+					spyOn(document, 'getElementsByTagName').and.returnValue([head]);
+				});
+
 				describe('when the dependencies are not already been loaded', function () {
 
 					it('should load the required dependency', function () {
-						var head = {
-								appendChild: jasmine.createSpy()
-							},
-							args;
+						var args;
 
-						spyOn(document, 'getElementsByTagName').and.returnValue([head]);
-
-						DIY.define('MYAPP.modules.moduleB', ['MYAPP.modules.moduleA'], function () {
-							return {};
-						});
+						DIY.define('MYAPP.modules.moduleB', ['MYAPP.modules.moduleA'], function () {});
 
 						args = head.appendChild.calls.mostRecent().args[0];
 
@@ -77,12 +80,7 @@ describe('DIY', function () {
 				describe('when the dependencies have already been loaded', function () {
 
 					it('should not load them again', function () {
-						var head = {
-								appendChild: jasmine.createSpy()
-							},
-							args;
-
-						spyOn(document, 'getElementsByTagName').and.returnValue([head]);
+						var args;
 
 						DIY.define('MYAPP.modules.moduleA', [], function () {});
 
