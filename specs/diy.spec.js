@@ -24,6 +24,10 @@ describe('DIY', function () {
 				});
 			});
 
+			afterEach(function () {
+				MYAPP = null;
+			});
+
 			it('should add to the namespace', function () {
 				var myModule;
 
@@ -48,23 +52,50 @@ describe('DIY', function () {
 
 			describe('if some dependencies are required', function () {
 
-				it('should load the required dependency', function () {
-					var head = {
-							appendChild: jasmine.createSpy()
-						},
-						args;
+				describe('when the dependencies are not already been loaded', function () {
 
-					spyOn(document, 'getElementsByTagName').and.returnValue([head]);
+					it('should load the required dependency', function () {
+						var head = {
+								appendChild: jasmine.createSpy()
+							},
+							args;
 
-					DIY.define('MYAPP.modules.moduleB', ['MYAPP.modules.moduleA'], function () {
-						return {};
+						spyOn(document, 'getElementsByTagName').and.returnValue([head]);
+
+						DIY.define('MYAPP.modules.moduleB', ['MYAPP.modules.moduleA'], function () {
+							return {};
+						});
+
+						args = head.appendChild.calls.mostRecent().args[0];
+
+						expect(args.childElementCount).toEqual(1);
+						expect(args.childNodes[0].src).toEqual(jsPath + 'modules/moduleA.js');
+						expect(args.childNodes[0].type).toEqual('text/javascript');
 					});
+				});
 
-					args = head.appendChild.calls.mostRecent().args[0];
+				describe('when the dependencies have already been loaded', function () {
 
-					expect(args.childElementCount).toEqual(1);
-					expect(args.childNodes[0].src).toEqual(jsPath + 'modules/moduleA.js');
-					expect(args.childNodes[0].type).toEqual('text/javascript');
+					it('should not load them again', function () {
+						var head = {
+								appendChild: jasmine.createSpy()
+							},
+							args;
+
+						spyOn(document, 'getElementsByTagName').and.returnValue([head]);
+
+						DIY.define('MYAPP.modules.moduleA', [], function () {});
+
+						DIY.define('MYAPP.modules.moduleB', ['MYAPP.modules.moduleA', 'MYAPP.modules.module1'], function () {
+							return {};
+						});
+
+						args = head.appendChild.calls.mostRecent().args[0];
+
+						expect(args.childElementCount).toEqual(1);
+						expect(args.childNodes[0].src).toEqual(jsPath + 'modules/module1.js');
+						expect(args.childNodes[0].type).toEqual('text/javascript');
+					});
 				});
 			});
 		});

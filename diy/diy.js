@@ -1,6 +1,6 @@
 /*global DIY: true*/
 
-var DIY = (function () {
+var DIY = (function (w) {
 	var jsPath = '',
 
 	composeScriptUrl = function (module) {
@@ -21,51 +21,86 @@ var DIY = (function () {
 	    return script;
 	},
 
+	isModuleAlreadyLoaded = function (module) {
+		var parts = module.split('.'),
+			root = w[parts.shift()],
+			currentPart,
+			i;
+
+		for (i = 0; i < parts.length; i++) {
+			currentPart = parts[i];
+			
+			if (!root[currentPart]) {
+				return false;
+			}
+
+			root = root[currentPart];
+		}
+
+		return true;
+	},
+
 	loadDependencies = function (requires) {
 		var i,
 			docfrag = document.createDocumentFragment(),
 			head = document.getElementsByTagName('head')[0];
 
 		for (i = 0; i < requires.length; i++) {
-			docfrag.appendChild(getScript.call(this, requires[i]));
+			if (!isModuleAlreadyLoaded(requires[i])) {
+				docfrag.appendChild(getScript.call(this, requires[i]));
+			}
 		}
 
 		head.appendChild(docfrag);
 	},
 
+	/**.*/
 	define = function (namespace, requires, body) {
-			var levels = namespace.split('.'),
-				appName = levels[0],
-				i,
-				root = window[appName] ? window[appName] : {};
+		var parts = namespace.split('.'),
+			appName = parts[0];
 
-			if (requires.length > 0) {
-				loadDependencies.call(this, requires);
-			}
+		if (!w[appName]) {
+			w[appName] = {};
+		}
 
-			window[appName] = root;
+		if (requires.length > 0) {
+			loadDependencies.call(this, requires);
+		}
 
-			for (i = 1; i < levels.length; i++) {
-				if (i < levels.length -  1) {
-					root[levels[i]] = root[levels[i]] ? root[levels[i]] : {};
-				} else {
-					root[levels[i]] = body;
+		createNamespace.call(this, w[appName], parts, body);
+	},
+
+	createNamespace = function (root, parts, body) {
+		var i,
+			length = parts.length,
+			current;
+
+		for (i = 1; i < length; i++) {
+			current = parts[i];
+
+			if (i < length -  1) {
+				if (!root[current]) {
+					root[current] = {};
 				}
-
-				root = root[levels[i]];
+			} else {
+				root[current] = body;
 			}
-		};
+
+			root = root[current];
+		}
+	},
+
+	/**.*/
+	init = function (cfg) {
+		this.define = define;
+
+		jsPath = cfg.jsPath;
+	};
 
 	return {
 		define: function () {
 			throw 'App not initialized. Please call DIY.init with proper params';
 		},
-
-		/**.*/
-		init: function (cfg) {
-			this.define = define;
-
-			jsPath = cfg.jsPath;
-		}
+		init: init
 	};
-})();
+})(window);
