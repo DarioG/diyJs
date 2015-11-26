@@ -67,7 +67,7 @@ var DIY = (function (w) {
 	* NOTE: you need to init the framework first, calling {DYI.init} init() <br />
 	* The regular way to define a constructor would be:
 	* <pre>
-	*	DIY.define('myNameSpace', {}, function () {
+	*	DIY.define('MyNameSpace', {}, function () {
 	*		var myPrivatevar = 1;
 	*
 	*		this.myPublicMethod = function () {
@@ -77,7 +77,7 @@ var DIY = (function (w) {
 	*
 	* If the constructor has some dependencies:
 	* <pre>
-	*	DIY.define('myNameSpace', {
+	*	DIY.define('MyNameSpace', {
 	*		requires: [
 	*			'MYAPP.module.myModuleNeeded1',
 	*			'MYAPP.module.myModuleNeeded2'
@@ -94,8 +94,8 @@ var DIY = (function (w) {
 	*
 	* If the constructor inherits from anyone else:
 	* <pre>
-	*	DIY.define('myNameSpace', {
-	*		extend: 'MYAPP.module.parentModule'
+	*	DIY.define('MyNameSpace', {
+	*		extend: 'MYAPP.module.ParentModule'
 	*	}, function () {
 	*		var myPrivatevar = 1;
 	*
@@ -104,9 +104,60 @@ var DIY = (function (w) {
 	*		}
 	* 	})
 	* </pre>
-	* This will add one instance of "parentModule" to the prototype of myNameSpace
+	* This will add one instance of "ParentModule" to the prototype of MyNameSpace
 	* NOTE: In this version the parent namespace should be already loaded.
 	*  There not load lazy loading implemented for parent constructors
+	*
+	* Parent constructor will be initialized with the arguments passed in to the child constructor,
+	* as it is supposed to be, i.e
+	* <pre>
+	*  	DIY.define('ParentModule', {}, function (cfg) {
+	*		var myPrivatevar = cfg.private;
+	* 	})
+	*
+	*	DIY.define('MyNameSpace', {
+	*		extend: 'MYAPP.module.ParentModule'
+	*	}, function () {
+	*		this.myPublicMethod = function () {
+	*			return myPrivatevar;
+	*		}
+	* 	})
+	*
+	*
+	*	var myChildInstance = MyNameSpace({
+	*		private: 'foo'
+	*	})
+	*
+	*
+	*	myChildInstance.myPublicMethod(); // this will return 'foo'
+	* </pre>
+	*
+	* Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.
+	* <pre>
+	*  	DIY.define('ParentModule', {}, function (cfg) {
+	*		var myPrivatevar = cfg.private;
+	*
+	*		this.myPublicMethod = function () {
+	*			return myPrivatevar;
+	*		}
+	* 	})
+	*
+	*	DIY.define('MyNameSpace', {
+	*		extend: 'MYAPP.module.ParentModule'
+	*	}, function () {
+	*		this.myPublicMethod = function () {
+	*			return this.parentClass.myPublicMethod() + ' and bar';
+	*		}
+	* 	})
+	*
+	*
+	*	var myChildInstance = MyNameSpace({
+	*		private: 'foo'
+	*	})
+	*
+	*
+	*	myChildInstance.myPublicMethod(); // this will return 'foo and bar''
+	* </pre>
 	* @param {String} namespace
 	* @param {Object} config Some configurations for the definition of the constructor
 	* @param {Function} config.extend. This parameter is mandatory.
