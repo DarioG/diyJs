@@ -3,11 +3,11 @@
 /**
 * @namespace
 */
-var DIY = (function (w) {
+var DIY = (function (window) {
 	var jsPath = '',
 
-	composeScriptUrl = function (module) {
-		var parts = module.split('.'),
+	composeScriptUrl = function (namespace) {
+		var parts = namespace.split('.'),
 			constructorName = parts.pop();
 
 		parts.shift();
@@ -19,9 +19,9 @@ var DIY = (function (w) {
 		return name.charAt(0).toLowerCase() + name.substr(1);
 	},
 
-	getScript = function (module) {
+	getScript = function (namespace) {
 	    var script = document.createElement('script'),
-	    	src = composeScriptUrl.call(this, module);
+	    	src = composeScriptUrl.call(this, namespace);
 
 	    script.setAttribute('type', 'text/javascript');
 	    script.setAttribute('src', src);
@@ -29,9 +29,9 @@ var DIY = (function (w) {
 	    return script;
 	},
 
-	isModuleAlreadyLoaded = function (module) {
-		var parts = module.split('.'),
-			root = w[parts.shift()],
+	isConstructorDefined = function (namespace) {
+		var parts = namespace.split('.'),
+			root = window[parts.shift()],
 			currentPart,
 			i;
 
@@ -54,7 +54,7 @@ var DIY = (function (w) {
 			head = document.getElementsByTagName('head')[0];
 
 		for (i = 0; i < requires.length; i++) {
-			if (!isModuleAlreadyLoaded(requires[i])) {
+			if (!isConstructorDefined(requires[i])) {
 				docfrag.appendChild(getScript.call(this, requires[i]));
 			}
 		}
@@ -170,53 +170,17 @@ var DIY = (function (w) {
 	define = function (namespace, config, body) {
 		var parts = namespace.split('.'),
 			appName = parts[0],
-			constructor,
 			requires = config.requires;
 
-		if (!w[appName]) {
-			w[appName] = {};
+		if (!window[appName]) {
+			window[appName] = {};
 		}
 
 		if (requires && requires.length > 0) {
 			loadDependencies.call(this, requires);
 		}
 
-		constructor = createNamespace.call(this, w[appName], parts, body, namespace, config.extend);
-	},
-
-	findConstructor = function (namespace) {
-		var parts = namespace.split('.'),
-			root = w[parts.shift()],
-			currentPart,
-			i;
-
-		for (i = 0; i < parts.length; i++) {
-			currentPart = parts[i];
-
-			if (!root[currentPart]) {
-				return false;
-			}
-
-			root = root[currentPart];
-		}
-
-		return root;
-	},
-
-	addInheritance = function (child, Parent) {
-		var borrowedConstructor = function () {
-			Parent.apply(this, arguments);
-			child.apply(this, arguments);
-		},
-		instance = new Parent();
-		borrowedConstructor.prototype = instance;
-		borrowedConstructor.prototype.parentClass = instance;
-
-		return borrowedConstructor;
-	},
-
-	isThereAParentConstructor = function (constructor) {
-		return !!constructor;
+		createNamespace.call(this, window[appName], parts, body, namespace, config.extend);
 	},
 
 	createNamespace = function (root, parts, body, namespace, parent) {
@@ -240,14 +204,47 @@ var DIY = (function (w) {
 
 			root = root[current];
 		}
+	},
+
+	findConstructor = function (namespace) {
+		var parts = namespace.split('.'),
+			root = window[parts.shift()],
+			currentPart,
+			i;
+
+		for (i = 0; i < parts.length; i++) {
+			currentPart = parts[i];
+
+			if (!root[currentPart]) {
+				return false;
+			}
+
+			root = root[currentPart];
+		}
 
 		return root;
 	},
 
+	inherit = function (child, Parent) {
+		var borrowedConstructor = function () {
+			Parent.apply(this, arguments);
+			child.apply(this, arguments);
+		},
+		instance = new Parent();
+		borrowedConstructor.prototype = instance;
+		borrowedConstructor.prototype.parentClass = instance;
+
+		return borrowedConstructor;
+	},
+
+	isThereAParentConstructor = function (constructor) {
+		return !!constructor;
+	},
+
 	getConstructor = function (body, parent) {
 		if (isThereAParentConstructor.call(this, parent)) {
-			if (isModuleAlreadyLoaded.call(this, parent)) {
-				return addInheritance(body, findConstructor.call(this, parent));
+			if (isConstructorDefined.call(this, parent)) {
+				return inherit(body, findConstructor.call(this, parent));
 			} else {
 				throw 'Parent constructor should be loaded manually to inherit from it.';
 			}
