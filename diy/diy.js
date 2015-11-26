@@ -7,11 +7,16 @@ var DIY = (function (w) {
 	var jsPath = '',
 
 	composeScriptUrl = function (module) {
-		var parts = module.split('.');
+		var parts = module.split('.'),
+			constructorName = parts.pop();
 
 		parts.shift();
 
-		return jsPath + parts.join('/') + '.js';
+		return jsPath + parts.join('/') + '/' + constructorNameToFileName(constructorName) + '.js';
+	},
+
+	constructorNameToFileName = function (name) {
+		return name.charAt(0).toLowerCase() + name.substr(1);
 	},
 
 	getScript = function (module) {
@@ -100,9 +105,11 @@ var DIY = (function (w) {
 	* 	})
 	* </pre>
 	* This will add one instance of "parentModule" to the prototype of myNameSpace
+	* NOTE: In this version the parent namespace should be already loaded.
+	*  There not load lazy loading implemented for parent constructors
 	* @param {String} namespace
 	* @param {Object} config Some configurations for the definition of the constructor
-	* @param {Function} config.extend. This parameter is mandotory.
+	* @param {Function} config.extend. This parameter is mandatory.
 	* 	If you dont need inheritance, just pass null, empty string or undefined.
 	* @param {Array} config.requires. Array with the modules which are required.
 	* 	If you dont need dependencies, just pass an empty array
@@ -113,8 +120,7 @@ var DIY = (function (w) {
 		var parts = namespace.split('.'),
 			appName = parts[0],
 			constructor,
-			requires = config.requires,
-			ParentNamespace = config.extend;
+			requires = config.requires;
 
 		if (!w[appName]) {
 			w[appName] = {};
@@ -124,18 +130,45 @@ var DIY = (function (w) {
 			loadDependencies.call(this, requires);
 		}
 
-		constructor = createNamespace.call(this, w[appName], parts, body, namespace);
+		constructor = createNamespace.call(this, w[appName], parts, body, namespace, config.extend);
+	},
 
-		if (isThereAParentConstructor.call(this, ParentNamespace)) {
-			constructor.prototype = new ParentNamespace();
+	findConstructor = function (namespace) {
+		var parts = namespace.split('.'),
+			root = w[parts.shift()],
+			currentPart,
+			i;
+
+		for (i = 0; i < parts.length; i++) {
+			currentPart = parts[i];
+
+			if (!root[currentPart]) {
+				return false;
+			}
+
+			root = root[currentPart];
 		}
+
+		return root;
+	},
+
+	addInheritance = function (child, Parent) {
+		var borrowedConstructor = function () {
+			Parent.apply(this, arguments);
+			child.apply(this, arguments);
+		},
+		instance = new Parent();
+		borrowedConstructor.prototype = instance;
+		borrowedConstructor.prototype.parentClass = instance;
+
+		return borrowedConstructor;
 	},
 
 	isThereAParentConstructor = function (constructor) {
-		return typeof constructor === 'function';
+		return !!constructor;
 	},
 
-	createNamespace = function (root, parts, body, namespace) {
+	createNamespace = function (root, parts, body, namespace, parent) {
 		var i,
 			length = parts.length,
 			current;
@@ -151,13 +184,25 @@ var DIY = (function (w) {
 				if (root[current]) {
 					throw 'The constructor "' + namespace + '" was already defined. Please check.';
 				}
-				root[current] = body;
+				root[current] = getConstructor.call(this, body, parent);
 			}
 
 			root = root[current];
 		}
 
 		return root;
+	},
+
+	getConstructor = function (body, parent) {
+		if (isThereAParentConstructor.call(this, parent)) {
+			if (isModuleAlreadyLoaded.call(this, parent)) {
+				return addInheritance(body, findConstructor.call(this, parent));
+			} else {
+				throw 'Parent constructor should be loaded manually to inherit from it.';
+			}
+		} else {
+			return body;
+		}
 	},
 
 	/**

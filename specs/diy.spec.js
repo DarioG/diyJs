@@ -14,7 +14,8 @@ describe('DIY', function () {
 
 		describe('when the application has been initialized', function () {
 
-			var jsPath;
+			var jsPath,
+				head;
 
 			beforeEach(function () {
 				jsPath = 'http://localhost/myjsPath/';
@@ -22,6 +23,12 @@ describe('DIY', function () {
 				DIY.init({
 					jsPath: jsPath
 				});
+
+				head = {
+					appendChild: jasmine.createSpy()
+				};
+
+				spyOn(document, 'getElementsByTagName').and.returnValue([head]);
 			});
 
 			afterEach(function () {
@@ -64,16 +71,6 @@ describe('DIY', function () {
 
 				describe('if some dependencies are required', function () {
 
-					var head;
-
-					beforeEach(function () {
-						head = {
-							appendChild: jasmine.createSpy()
-						};
-
-						spyOn(document, 'getElementsByTagName').and.returnValue([head]);
-					});
-
 					describe('when the dependencies are not already been loaded', function () {
 
 						it('should load the required dependency', function () {
@@ -115,25 +112,75 @@ describe('DIY', function () {
 
 					describe('and the parent class is defined', function () {
 
-						it('should inherit the parent method and properties', function () {
-							var child;
-
-							DIY.define('MYAPP.modules.parent', {}, function () {
-								this.attr = 'module1';
+						beforeEach(function () {
+							DIY.define('MYAPP.modules.Parent', {}, function (cfg) {
+								this.attr = (cfg && cfg.attr) ? cfg.attr : 'module1';
 
 								this.getMessage = function () {
-									return 'this is the parent mathod';
+									return 'this is the parent method';
+								};
+							});
+						});
+
+						it('should initialize the parent constructor', function () {
+							var child;
+
+							DIY.define('MYAPP.modules.Child', {
+								extend: 'MYAPP.modules.Parent'
+							}, function () {
+								this.getAttr = function () {
+									return this.attr;
 								};
 							});
 
+							child = new MYAPP.modules.Child({
+								attr: 'This should work'
+							});
+
+							expect(child.getAttr()).toEqual('This should work');
+						});
+
+						it('should inherit the parent method and properties', function () {
+							var child;
+
 							DIY.define('MYAPP.modules.Child', {
-								extend: MYAPP.modules.parent
+								extend: 'MYAPP.modules.Parent'
 							}, function () {});
 
 							child = new MYAPP.modules.Child();
 
-							expect(child.getMessage()).toEqual('this is the parent mathod');
-							expect(child instanceof MYAPP.modules.parent).toBe(true);
+							expect(child.getMessage()).toEqual('this is the parent method');
+							expect(child instanceof MYAPP.modules.Parent).toBe(true);
+						});
+
+						it('should allow polymorphism', function () {
+							var child,
+								expectedMessage = 'this is the parent method called from the child';
+
+							DIY.define('MYAPP.modules.Child', {
+								extend: 'MYAPP.modules.Parent'
+							}, function () {
+
+								this.getMessage = function () {
+									return this.parentClass.getMessage() + ' called from the child';
+								};
+							});
+
+							child = new MYAPP.modules.Child();
+
+							expect(child.getMessage()).toEqual(expectedMessage);
+						});
+					});
+
+					describe('but the parent class is not defined', function () {
+
+						it('should throw an exception', function () {
+                            expect(function () {
+                                DIY.define('MYAPP.modules.Child', {
+                                    extend: 'MYAPP.modules.Parent'
+                                }, function () {});
+                            }).toThrow('Parent constructor should be loaded' +
+                                ' manually to inherit from it.');
 						});
 					});
 				});
