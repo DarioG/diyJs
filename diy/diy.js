@@ -180,10 +180,10 @@ var DIY = (function (window) {
 			loadDependencies.call(this, requires);
 		}
 
-		createNamespace.call(this, window[appName], parts, body, namespace, config.extend);
+		createNamespace.call(this, window[appName], parts, body, namespace, config);
 	},
 
-	createNamespace = function (root, parts, body, namespace, parent) {
+	createNamespace = function (root, parts, body, namespace, config) {
 		var i,
 			length = parts.length,
 			current;
@@ -199,7 +199,7 @@ var DIY = (function (window) {
 				if (root[current]) {
 					throw 'The constructor "' + namespace + '" was already defined. Please check.';
 				}
-				root[current] = getConstructor.call(this, body, parent);
+				root[current] = getClass.call(this, body, config.singleton, config.extend);
 			}
 
 			root = root[current];
@@ -241,15 +241,31 @@ var DIY = (function (window) {
 		return !!constructor;
 	},
 
-	getConstructor = function (body, parent) {
+	getClass = function (Constructor, singleton, parent) {
+		if (singleton) {
+			return getSingletonObject.call(this, Constructor, parent);
+		}
+
+		return getConstructor.call(this, Constructor, parent);
+	},
+
+	getSingletonObject = function (Constructor, parent) {
+		if (isThereAParentConstructor.call(this, parent)) {
+			throw 'Inheritance for singleton objects is not supported.';
+		}
+
+		return new Constructor();
+	},
+
+	getConstructor = function (Constructor, parent) {
 		if (isThereAParentConstructor.call(this, parent)) {
 			if (isConstructorDefined.call(this, parent)) {
-				return inherit(body, findConstructor.call(this, parent));
+				return inherit(Constructor, findConstructor.call(this, parent));
 			} else {
 				throw 'Parent constructor should be loaded manually to inherit from it.';
 			}
 		} else {
-			return body;
+			return Constructor;
 		}
 	},
 
