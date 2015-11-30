@@ -1,55 +1,55 @@
-/* global MYAPP */
+/* global MYAPP:true */
 describe('DIY', function () {
 
-	describe('define()', function () {
+    describe('define()', function () {
 
-		describe('if the application has not been initialized', function () {
+        describe('if the application has not been initialized', function () {
 
-			it('should throw an exception', function () {
-				expect(function () {
-					DIY.define('MYAPP.modules.moduleA', {}, function () {});
-				}).toThrow('App not initialized. Please call DIY.init with proper params');
-			});
-		});
+            it('should throw an exception', function () {
+                expect(function () {
+                    DIY.define('MYAPP.modules.moduleA', {}, function () {});
+                }).toThrow('App not initialized. Please call DIY.init with proper params');
+            });
+        });
 
-		describe('when the application has been initialized', function () {
+        describe('when the application has been initialized', function () {
 
-			var jsPath,
-				head;
+            var jsPath,
+                head;
 
-			beforeEach(function () {
-				jsPath = 'http://localhost/myjsPath/';
+            beforeEach(function () {
+                jsPath = 'http://localhost/myjsPath/';
 
-				DIY.init({
-					jsPath: jsPath
-				});
+                DIY.init({
+                    jsPath: jsPath
+                });
 
-				head = {
-					appendChild: jasmine.createSpy()
-				};
+                head = {
+                    appendChild: jasmine.createSpy()
+                };
 
-				spyOn(document, 'getElementsByTagName').and.returnValue([head]);
-			});
+                spyOn(document, 'getElementsByTagName').and.returnValue([head]);
+            });
 
-			afterEach(function () {
-				MYAPP = null;
-			});
+            afterEach(function () {
+                MYAPP = null;
+            });
 
-			describe('if the namespace was already created', function () {
+            describe('if the namespace was already created', function () {
 
-				it('should throw an exception', function () {
-					var namespace = 'MYAPP.modules.moduleA';
+                it('should throw an exception', function () {
+                    var namespace = 'MYAPP.modules.moduleA';
 
-					DIY.define(namespace, {}, function () {});
+                    DIY.define(namespace, {}, function () {});
 
-					expect(function () {
-						DIY.define(namespace, {}, function () {});
-					}).toThrow('The constructor "' + namespace +
-					'" was already defined. Please check.');
-				});
-			});
+                    expect(function () {
+                        DIY.define(namespace, {}, function () {});
+                    }).toThrow('The constructor "' + namespace +
+                    '" was already defined. Please check.');
+                });
+            });
 
-			describe('if the namespace was NOT already created', function () {
+            describe('if the namespace was NOT already created', function () {
 
                 describe('if the class is defined as singleton', function () {
 
@@ -90,7 +90,7 @@ describe('DIY', function () {
                         myModule = new MYAPP.modules.moduleA();
                         expect(myModule.attr).toBe('module1');
 
-                        DIY.define('MYAPP.modules.moduleB',{}, function () {
+                        DIY.define('MYAPP.modules.moduleB', {}, function () {
                             this.attr = 'module2';
                         });
 
@@ -217,7 +217,7 @@ describe('DIY', function () {
                         });
                     });
                 });
-			});
-		});
-	});
+            });
+        });
+    });
 });
