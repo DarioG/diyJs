@@ -30,5 +30,7 @@ DIY.define('MYAPP.controllers.Maincontroller', {
 MYAPP.controllers.Maincontroller.prototype.myPublicMethod = function () {
     ....my code here
 };
+
+var myController = new MYAPP.controllers.Maincontroller(myConfigHere);
 ```
 
