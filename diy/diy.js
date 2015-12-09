@@ -65,19 +65,29 @@ var DIY = (function (window) {
 
     /**
     * Define your namespace with this method. <br />
+    *
     * NOTE: you need to init the framework first, calling {DYI.init} init() <br />
-    * The regular way to define a constructor would be:
-    * <pre>
+    *
+    * In this version you can: <br />
+    *   * Define classes <br />
+    *   * Use inheritance <br />
+    *   * Lazy load of dependencies. <br />
+    *   * Polymorphism <br />
+    *   * Define a singleton class ( inheritance is not supported here yet ) <br />
+    *
+    * @example
+    * <caption>The regular way to define a constructor would be:</caption>
+    *
     *   DIY.define('MyNameSpace', {}, function () {
     *       var myPrivatevar = 1;
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
-    *       }
-    *   })
+    *       }:
+    *   });
+    * @example
+    * <caption>If the constructor has some dependencies:</caption>
     *
-    * If the constructor has some dependencies:
-    * <pre>
     *   DIY.define('MyNameSpace', {
     *       requires: [
     *           'MYAPP.module.myModuleNeeded1',
@@ -88,13 +98,17 @@ var DIY = (function (window) {
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
-    *       }
-    *   })
-    * </pre>
-    * This will load the dependencies, if they were not already loaded, asyncronously
+    *       };
+    *   });
     *
-    * If the constructor inherits from anyone else:
-    * <pre>
+    * 
+    *
+    * @example
+    * <caption>This will load the dependencies, if not yet loaded, asyncronously </br></br></br>
+    * 
+    *   If the constructor inherits from anyone else:
+    * </caption>
+    *
     *   DIY.define('MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
@@ -102,63 +116,91 @@ var DIY = (function (window) {
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
-    *       }
-    *   })
-    * </pre>
-    * This will add one instance of "ParentModule" to the prototype of MyNameSpace
+    *       };
+    *   });
+    *
+    * @example
+    * <caption>This will add one instance of "ParentModule" to the prototype of MyNameSpace </br>
     * NOTE: In this version the parent namespace should be already loaded.
-    *  There not load lazy loading implemented for parent constructors
+    *  There not load lazy loading implemented for parent constructors </br></br></br>
     *
     * Parent constructor will be initialized with the arguments passed in to the child constructor,
     * as it is supposed to be, i.e
-    * <pre>
+    * </caption>
+    *
     *   DIY.define('ParentModule', {}, function (cfg) {
     *       var myPrivatevar = cfg.private;
-    *   })
+    *   });
     *
     *   DIY.define('MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
-    *       }
-    *   })
+    *       };
+    *   });
     *
     *
     *   var myChildInstance = MyNameSpace({
     *       private: 'foo'
-    *   })
+    *   });
     *
     *
     *   myChildInstance.myPublicMethod(); // this will return 'foo'
-    * </pre>
     *
-    * Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.
-    * <pre>
+    * @example
+    * <caption>
+    *   Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.
+    * </caption>
+    *
     *   DIY.define('ParentModule', {}, function (cfg) {
     *       var myPrivatevar = cfg.private;
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
-    *       }
-    *   })
+    *       };
+    *   });
     *
     *   DIY.define('MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
     *       this.myPublicMethod = function () {
     *           return this.parentClass.myPublicMethod() + ' and bar';
-    *       }
-    *   })
+    *       };
+    *   });
     *
     *
     *   var myChildInstance = MyNameSpace({
     *       private: 'foo'
-    *   })
+    *   });
     *
     *
-    *   myChildInstance.myPublicMethod(); // this will return 'foo and bar''
-    * </pre>
+    *   myChildInstance.myPublicMethod(); // this will return 'foo and bar'
+    *
+    *
+    * @example
+    * <caption>You can also define a singleton class, i.e.</caption>
+    *
+    *   DIY.define('singletonClass', {
+    *       singleton: true
+    *   }, function () {
+    *       this.myPublicMethod = function () {
+    *           return 'my singleton object';
+    *       };
+    *   });
+    *
+    * @example
+    * <caption>then you will be able to access to the public methods directly like this</caption>
+    * 
+    *  singletonClass.myPublicMethod(); // this will return 'my singleton object'
+    * 
+    * @example
+    * <caption>
+    *   otherwise if you try to instanciate again with new, it will throw an exception
+    * </caption>
+    *
+    *  var myNewInstance = new singletonClass(); // This will throw
+    *
     * @param {String} namespace
     * @param {Object} config Some configurations for the definition of the constructor
     * @param {Function} config.extend. This parameter is mandatory.

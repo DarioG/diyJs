@@ -1,29 +1,52 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>JSDoc: Namespace: DIY</title>
+	<meta charset="utf-8">
+	<title>DiyJs Namespace: DIY</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
 </head>
 
 <body>
 
-<div id="main">
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">DiyJs</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="DIY.html">DIY</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
 
-    <h1 class="page-title">Namespace: DIY</h1>
 
-    
+<div class="container">
+<div class="row">
 
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
 
-
-
+	<h1 class="page-title">Namespace: DIY</h1>
 <section>
 
 <header>
@@ -35,15 +58,21 @@
     
 </header>
 
+
 <article>
     <div class="container-overview">
     
         
 
         
-
-
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -53,34 +82,35 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-7">line 7</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="diy.js.html">diy.js</a>, <a href="diy.js.html#line6">line 6</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
@@ -94,7 +124,7 @@
 
     
 
-     
+    
 
     
 
@@ -103,33 +133,41 @@
     
         <h3 class="subsection-title">Methods</h3>
 
-        
+        <dl>
             
+<hr>
+<dt>
+    <h4 class="name" id=".define"><span class="type-signature">&lt;static> </span>define(namespace, config)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Define your namespace with this method. <br /></p>
+<p>NOTE: you need to init the framework first, calling {DYI.init} init() <br /></p>
+<p>In this version you can: <br /></p>
+<ul>
+<li>Define classes <br /></li>
+<li>Use inheritance <br /></li>
+<li>Lazy load of dependencies. <br /></li>
+<li>Polymorphism <br /></li>
+<li>Define a singleton class ( inheritance is not supported here yet ) <br /></li>
+</ul>
+    </div>
+    
 
     
 
-    <h4 class="name" id=".define"><span class="type-signature">(static) </span>define<span class="signature">(namespace, config)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Define your namespace with this method. <br />NOTE: you need to init the framework first, calling {DYI.init} init() <br />The regular way to define a constructor would be:<pre>	DIY.define('MyNameSpace', {}, function () {		var myPrivatevar = 1;		this.myPublicMethod = function () {			return myPrivatevar;		}	})If the constructor has some dependencies:<pre>	DIY.define('MyNameSpace', {		requires: [			'MYAPP.module.myModuleNeeded1',			'MYAPP.module.myModuleNeeded2'		]	}, function () {		var myPrivatevar = 1;		this.myPublicMethod = function () {			return myPrivatevar;		}	})</pre>This will load the dependencies, if they were not already loaded, asyncronouslyIf the constructor inherits from anyone else:<pre>	DIY.define('MyNameSpace', {		extend: 'MYAPP.module.ParentModule'	}, function () {		var myPrivatevar = 1;		this.myPublicMethod = function () {			return myPrivatevar;		}	})</pre>This will add one instance of "ParentModule" to the prototype of MyNameSpaceNOTE: In this version the parent namespace should be already loaded. There not load lazy loading implemented for parent constructorsParent constructor will be initialized with the arguments passed in to the child constructor,as it is supposed to be, i.e<pre> 	DIY.define('ParentModule', {}, function (cfg) {		var myPrivatevar = cfg.private;	})	DIY.define('MyNameSpace', {		extend: 'MYAPP.module.ParentModule'	}, function () {		this.myPublicMethod = function () {			return myPrivatevar;		}	})	var myChildInstance = MyNameSpace({		private: 'foo'	})	myChildInstance.myPublicMethod(); // this will return 'foo'</pre>Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.<pre> 	DIY.define('ParentModule', {}, function (cfg) {		var myPrivatevar = cfg.private;		this.myPublicMethod = function () {			return myPrivatevar;		}	})	DIY.define('MyNameSpace', {		extend: 'MYAPP.module.ParentModule'	}, function () {		this.myPublicMethod = function () {			return this.parentClass.myPublicMethod() + ' and bar';		}	})	var myChildInstance = MyNameSpace({		private: 'foo'	})	myChildInstance.myPublicMethod(); // this will return 'foo and bar''</pre>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -160,6 +198,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -183,6 +222,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -190,11 +230,11 @@
 
             
 
-            <td class="description last">Some configurations for the definition of the constructor
-                <h6>Properties</h6>
+            <td class="description last"><p>Some configurations for the definition of the constructor</p>
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -225,6 +265,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -232,7 +273,8 @@
 
             
 
-            <td class="description last">This parameter is mandatory.	If you dont need inheritance, just pass null, empty string or undefined.</td>
+            <td class="description last"><p>This parameter is mandatory.
+  If you dont need inheritance, just pass null, empty string or undefined.</p></td>
         </tr>
 
     
@@ -248,6 +290,7 @@
 <span class="param-type">Array</span>
 
 
+
             
             </td>
 
@@ -255,7 +298,8 @@
 
             
 
-            <td class="description last">Array with the modules which are required.	If you dont need dependencies, just pass an empty array</td>
+            <td class="description last"><p>Array with the modules which are required.
+  If you dont need dependencies, just pass an empty array</p></td>
         </tr>
 
     
@@ -278,6 +322,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -285,19 +330,24 @@
 
             
 
-            <td class="description last">Constructor code</td>
+            <td class="description last"><p>Constructor code</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -307,78 +357,116 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-213">line 213</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="diy.js.html">diy.js</a>, <a href="diy.js.html#line170">line 170</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">The regular way to define a constructor would be:</p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MyNameSpace&#x27;, {}, function () {      var myPrivatevar = 1;      this.myPublicMethod = function () {          return myPrivatevar;      }:  });</pre>
+
+        <p class="code-caption">If the constructor has some dependencies:</p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MyNameSpace&#x27;, {      requires: [          &#x27;MYAPP.module.myModuleNeeded1&#x27;,          &#x27;MYAPP.module.myModuleNeeded2&#x27;      ]  }, function () {      var myPrivatevar = 1;      this.myPublicMethod = function () {          return myPrivatevar;      };  });</pre>
+
+        <p class="code-caption">This will load the dependencies, if not yet loaded, asyncronously </br></br></br>  If the constructor inherits from anyone else:</p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      var myPrivatevar = 1;      this.myPublicMethod = function () {          return myPrivatevar;      };  });</pre>
+
+        <p class="code-caption">This will add one instance of "ParentModule" to the prototype of MyNameSpace </br>NOTE: In this version the parent namespace should be already loaded. There not load lazy loading implemented for parent constructors </br></br></br>Parent constructor will be initialized with the arguments passed in to the child constructor,as it is supposed to be, i.e</p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;ParentModule&#x27;, {}, function (cfg) {      var myPrivatevar = cfg.private;  });  DIY.define(&#x27;MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      this.myPublicMethod = function () {          return myPrivatevar;      };  });  var myChildInstance = MyNameSpace({      private: &#x27;foo&#x27;  });  myChildInstance.myPublicMethod(); // this will return &#x27;foo&#x27;</pre>
+
+        <p class="code-caption">  Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.</p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;ParentModule&#x27;, {}, function (cfg) {      var myPrivatevar = cfg.private;      this.myPublicMethod = function () {          return myPrivatevar;      };  });  DIY.define(&#x27;MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      this.myPublicMethod = function () {          return this.parentClass.myPublicMethod() + &#x27; and bar&#x27;;      };  });  var myChildInstance = MyNameSpace({      private: &#x27;foo&#x27;  });  myChildInstance.myPublicMethod(); // this will return &#x27;foo and bar&#x27;</pre>
+
+        <p class="code-caption">You can also define a singleton class, i.e.</p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;singletonClass&#x27;, {      singleton: true  }, function () {      this.myPublicMethod = function () {          return &#x27;my singleton object&#x27;;      };  });</pre>
+
+        <p class="code-caption">then you will be able to access to the public methods directly like this</p>
+    
+    <pre class="sunlight-highlight-javascript"> singletonClass.myPublicMethod(); // this will return &#x27;foo and bar&#x27;&#x27;</pre>
+
+        <p class="code-caption">  otherwise if you try to instanciate again with new, it will throw an exception</p>
+    
+    <pre class="sunlight-highlight-javascript"> var myNewInstance = new singletonClass(); // This will throw</pre>
 
 
-
-
-
-
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id=".init"><span class="type-signature">&lt;static> </span>init(cfg)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>You need to call this method at the beggining of you app with the proper config object
+  otherwise you wont be able to use the framework.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id=".init"><span class="type-signature">(static) </span>init<span class="signature">(cfg)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    You need to call this method at the beggining of you app with the proper config object	otherwise you wont be able to use the framework.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -409,6 +497,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -417,10 +506,10 @@
             
 
             <td class="description last">
-                <h6>Properties</h6>
+                <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -451,6 +540,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -458,7 +548,10 @@
 
             
 
-            <td class="description last">Path to the place where your js modules are placed. i.e.<pre>	jsPath: 'http://localhost/assets/js/src/'</pre></td>
+            <td class="description last"><p>Path to the place where your js modules are placed. i.e.</p>
+<pre>
+  jsPath: 'http://localhost/assets/js/src/'
+</pre></td>
         </tr>
 
     
@@ -472,12 +565,17 @@
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -487,52 +585,54 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-326">line 326</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="diy.js.html">diy.js</a>, <a href="diy.js.html#line269">line 269</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
+</dd>
 
-
-
-
-
-
-
-
-        
+        </dl>
     
 
     
@@ -545,19 +645,105 @@
 
 
 
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3"></div>
+		</div>
+	
+
+</div>
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="DIY.html">DIY</a></li></ul>
-</nav>
-
-<br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Thu Nov 26 2015 21:32:10 GMT+0100 (Hora estándar romance)
+
+
+	<span class="copyright">
+	DocStrap Copyright © 2012-2014 The contributors to the JSDoc3 and DocStrap projects.
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a>
+	on Wed Dec 9th 2015 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
 </body>
 </html>
