@@ -19,13 +19,9 @@ To see the documentation:
 
     1. Clone the repo
     2. Install npm dependencies
-        ```bash
         npm install
-        ```
     3. run grunt docs
-        ```bash
         grunt doc
-        ```
 
 #### Example
 
