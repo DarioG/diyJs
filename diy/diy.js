@@ -101,11 +101,11 @@ var DIY = (function (window) {
     *       };
     *   });
     *
-    * 
+    *
     *
     * @example
     * <caption>This will load the dependencies, if not yet loaded, asyncronously </br></br></br>
-    * 
+    *
     *   If the constructor inherits from anyone else:
     * </caption>
     *
@@ -191,9 +191,9 @@ var DIY = (function (window) {
     *
     * @example
     * <caption>then you will be able to access to the public methods directly like this</caption>
-    * 
+    *
     *  singletonClass.myPublicMethod(); // this will return 'my singleton object'
-    * 
+    *
     * @example
     * <caption>
     *   otherwise if you try to instanciate again with new, it will throw an exception

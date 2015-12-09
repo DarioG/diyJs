@@ -30,14 +30,34 @@ module.exports = function (grunt) {
             options: {
                 config: '.jscs.json'
             }
+        },
+
+        watch: {
+            docs: {
+                files: ['diy/*.js'],
+                tasks: ['jsdoc']
+            },
+
+            qa: {
+                files: [
+                    'diy/**/*.js',
+                    'specs/**/*.js'
+                ],
+                tasks: [
+                    'jshint',
+                    'jscs'
+                ]
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('doc', ['jsdoc']);
+    grunt.registerTask('dev', ['watch']);
     grunt.registerTask('qa', [
         'jshint',
         'jscs'
