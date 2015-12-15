@@ -216,7 +216,7 @@ var DIY = (function (window) {
     * @example
     * <caption>You can also define a singleton class, i.e.</caption>
     *
-    *   DIY.define('singletonClass', {
+    *   DIY.define('MYAPP.singletonClass', {
     *       singleton: true
     *   }, function () {
     *       this.myPublicMethod = function () {
@@ -225,16 +225,45 @@ var DIY = (function (window) {
     *   });
     *
     * @example
-    * <caption>then you will be able to access to the public methods directly like this</caption>
+    * <caption>then you will be able to access to the public methods like this</caption>
     *
-    *  singletonClass.myPublicMethod(); // this will return 'my singleton object'
+    *  var mySingletonInstance = new MYAPP.singletonClass();
+    *  mySingletonInstance.myPublicMethod(); // this will return 'my singleton object'
     *
     * @example
-    * <caption>
-    *   otherwise if you try to instanciate again with new, it will throw an exception
-    * </caption>
+    * <caption>Remember that it will only create the instance the first time you call it.
+    *  The following times it will return the same instance.
+    *  </caption>
     *
-    *  var myNewInstance = new singletonClass(); // This will throw
+    *  var mySingletonInstance = new MYAPP.singletonClass();
+    *  var mySingletonInstance2 = new MYAPP.singletonClass();
+    *  mySingletonInstance === mySingletonInstance2; // true
+    *
+    * @example
+    * <caption> You can add a initialize method to a singleton class if you want.
+    *   This is not mandatory but this is usefull when you want to initialize a singleton
+    *   class or pass dependencies.
+    *  </caption>
+    *
+    *   DIY.define('MYAPP.singletonClass', {
+    *       singleton: true
+    *   }, function () {
+    *       var dependency;
+    *
+    *       this.initialize = function (cfg) {
+    *           dependency = cfg.dependency;
+    *       };
+
+    *       this.myPublicMethod = function () {
+    *           return dependency;
+    *       };
+    *   });
+    *
+    *   var mySingletonInstance = new MYAPP.singletonClass({
+    *       dependency: 'hey'
+    *   });
+    *
+    *   mySingletonInstance.myPublicMethod();// hey
     *
     * @param {String} namespace
     * @param {Object} config Some configurations for the definition of the constructor

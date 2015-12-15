@@ -375,7 +375,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
-				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-248">line 248</a>
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-277">line 277</a>
 			</li>
 		</ul>
 	</dd>
@@ -430,15 +430,19 @@
 
         <p class="code-caption">You can also define a singleton class, i.e.</p>
     
-    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;singletonClass&#x27;, {      singleton: true  }, function () {      this.myPublicMethod = function () {          return &#x27;my singleton object&#x27;;      };  });</pre>
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.singletonClass&#x27;, {      singleton: true  }, function () {      this.myPublicMethod = function () {          return &#x27;my singleton object&#x27;;      };  });</pre>
 
-        <p class="code-caption">then you will be able to access to the public methods directly like this</p>
+        <p class="code-caption">then you will be able to access to the public methods like this</p>
     
-    <pre class="sunlight-highlight-javascript"> singletonClass.myPublicMethod(); // this will return &#x27;my singleton object&#x27;</pre>
+    <pre class="sunlight-highlight-javascript"> var mySingletonInstance = new MYAPP.singletonClass(); mySingletonInstance.myPublicMethod(); // this will return &#x27;my singleton object&#x27;</pre>
 
-        <p class="code-caption">  otherwise if you try to instanciate again with new, it will throw an exception</p>
+        <p class="code-caption">Remember that it will only create the instance the first time you call it. The following times it will return the same instance. </p>
     
-    <pre class="sunlight-highlight-javascript"> var myNewInstance = new singletonClass(); // This will throw</pre>
+    <pre class="sunlight-highlight-javascript"> var mySingletonInstance = new MYAPP.singletonClass(); var mySingletonInstance2 = new MYAPP.singletonClass(); mySingletonInstance === mySingletonInstance2; // true</pre>
+
+        <p class="code-caption"> You can add a initialize method to a singleton class if you want.  This is not mandatory but this is usefull when you want to initialize a singleton  class or pass dependencies. </p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.singletonClass&#x27;, {      singleton: true  }, function () {      var dependency;      this.initialize = function (cfg) {          dependency = cfg.dependency;      };      this.myPublicMethod = function () {          return dependency;      };  });  var mySingletonInstance = new MYAPP.singletonClass({      dependency: &#x27;hey&#x27;  });  mySingletonInstance.myPublicMethod();// hey</pre>
 
 
     
@@ -607,7 +611,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
-				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-400">line 400</a>
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-429">line 429</a>
 			</li>
 		</ul>
 	</dd>
