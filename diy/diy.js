@@ -78,7 +78,7 @@ var DIY = (function (window) {
     * @example
     * <caption>The regular way to define a constructor would be:</caption>
     *
-    *   DIY.define('MyNameSpace', {}, function () {
+    *   DIY.define('MYAPP.MyNameSpace', {}, function () {
     *       var myPrivatevar;
     *
     *       this.initialize = function () {
@@ -87,14 +87,14 @@ var DIY = (function (window) {
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
-    *       }:
+    *       };
     *   });
     * @example
     * <caption>you should always initialize you class with the initialize method and
     *   not directly in the constructor, ie: </caption>
     *
     *   // Very bad. Init config objec should not be passed here
-    *   DIY.define('MyNameSpace', {}, function (cfg) {
+    *   DIY.define('MYAPP.MyNameSpace', {}, function (cfg) {
     *       var myPrivatevar = 1;  // Bad
     *
     *       // Good. You should pass you config object into the initialize method
@@ -115,7 +115,7 @@ var DIY = (function (window) {
     *
     *   If the constructor has some dependencies:</caption>
     *
-    *   DIY.define('MyNameSpace', {
+    *   DIY.define('MYAPP.MyNameSpace', {
     *       requires: [
     *           'MYAPP.module.myModuleNeeded1',
     *           'MYAPP.module.myModuleNeeded2'
@@ -136,7 +136,7 @@ var DIY = (function (window) {
     *   If the constructor inherits from anyone else:
     * </caption>
     *
-    *   DIY.define('MyNameSpace', {
+    *   DIY.define('MYAPP.MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
     *       var myPrivatevar;
@@ -155,36 +155,36 @@ var DIY = (function (window) {
     * as it is supposed to be, i.e
     * </caption>
     *
-    *   DIY.define('ParentModule', {}, function () {
-    *       var myPrivatevar;
+    *  DIY.define('MYAPP.module.ParentModule', {}, function () {
+    *      this.myParentVar;
     *
-    *       this.initialize = function (cfg) {
-    *           myPrivatevar = cfg.private;
-    *       };
-    *   });
+    *      this.initialize = function (cfg) {
+    *          this.myParentVar = cfg.private;
+    *      };
+    *  });
     *
-    *   DIY.define('MyNameSpace', {
-    *       extend: 'MYAPP.module.ParentModule'
-    *   }, function () {
-    *       this.myPublicMethod = function () {
-    *           return myPrivatevar;
-    *       };
-    *   });
-    *
-    *
-    *   var myChildInstance = MyNameSpace({
-    *       private: 'foo'
-    *   });
+    *  DIY.define('MYAPP.module.MyNameSpace', {
+    *      extend: 'MYAPP.module.ParentModule'
+    *  }, function () {
+    *      this.myPublicMethod = function () {
+    *          return this.myParentVar;
+    *      };
+    *  });
     *
     *
-    *   myChildInstance.myPublicMethod(); // this will return 'foo'
+    *  var myChildInstance = new MYAPP.module.MyNameSpace({
+    *      private: 'foo'
+    *  });
+    *
+    *
+    *  myChildInstance.myPublicMethod();
     *
     * @example
     * <caption>
     *   Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.
     * </caption>
     *
-    *   DIY.define('ParentModule', {}, function () {
+    *   DIY.define('MYAPP.module.ParentModule', {}, function () {
     *       var myPrivatevar;
     *
     *       this.initialize = function (cfg) {
@@ -196,7 +196,7 @@ var DIY = (function (window) {
     *       };
     *   });
     *
-    *   DIY.define('MyNameSpace', {
+    *   DIY.define('MYAPP.module.MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
     *       this.myPublicMethod = function () {
@@ -205,7 +205,7 @@ var DIY = (function (window) {
     *   });
     *
     *
-    *   var myChildInstance = MyNameSpace({
+    *   var myChildInstance = new MYAPP.module.MyNameSpace({
     *       private: 'foo'
     *   });
     *
@@ -352,13 +352,22 @@ var DIY = (function (window) {
         }
     },
 
+    shouldInitialize = function (config) {
+        return !config || !config.__notInitialize;
+    },
+
     getBorrowedConstructor = function (Constructor) {
         var borrowedConstructor = function () {
                 if (!this.initialize) {
                     throw 'Error. Class does not have initialize method';
                 }
 
-                this.initialize.apply(this, arguments);
+                // when this constructor is called from the inherits method, 
+                // initialize method should not be called, since the constructor
+                // is nt being initialized yet.
+                if (shouldInitialize.call(this, arguments[0])) {
+                    this.initialize.apply(this, arguments);
+                }
             };
 
         borrowedConstructor.prototype = new Constructor();
@@ -367,7 +376,9 @@ var DIY = (function (window) {
 
     inherit = function (Child, Parent) {
         var borrowedConstructor,
-            instance = new Parent();
+            instance = new Parent({
+                __notInitialize: true
+            });
 
         Child.prototype = instance;
         borrowedConstructor = getBorrowedConstructor.call(this, Child);

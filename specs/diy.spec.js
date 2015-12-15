@@ -222,7 +222,7 @@ describe('DIY', function () {
                                         this.attr = '';
 
                                         this.initialize = function (cfg) {
-                                            this.attr = (cfg && cfg.attr) ? cfg.attr : 'module1';
+                                            this.attr = cfg.attr;
                                         };
 
                                         this.getMessage = function () {
@@ -281,7 +281,7 @@ describe('DIY', function () {
                                         };
                                     });
 
-                                    child = new MYAPP.modules.Child();
+                                    child = new MYAPP.modules.Child({});
 
                                     expect(child.getMessage()).toEqual(msg);
                                 });
