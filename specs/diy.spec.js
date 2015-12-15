@@ -289,43 +289,43 @@ describe('DIY', function () {
                                 describe('when another class inherits from the child', function () {
 
                                     it('should get the props of the grandparent', function () {
-                                            var instance;
+                                        var instance;
 
-                                            DIY.define('MYAPP.modules.Child', {
-                                                extend: 'MYAPP.modules.Parent'
-                                            }, function () {
-                                                this.initialize = function (cfg) {
-                                                    this.parentClass.initialize(cfg);
-                                                };
+                                        DIY.define('MYAPP.modules.Child', {
+                                            extend: 'MYAPP.modules.Parent'
+                                        }, function () {
+                                            this.initialize = function (cfg) {
+                                                this.parentClass.initialize(cfg);
+                                            };
 
-                                                this.getMessage = function () {
-                                                    return this.parentClass.getMessage() +
-                                                    ' called from the child';
-                                                };
-                                            });
+                                            this.getMessage = function () {
+                                                return this.parentClass.getMessage() +
+                                                ' called from the child';
+                                            };
+                                        });
 
-                                            DIY.define('MYAPP.modules.GrandChild', {
-                                                extend: 'MYAPP.modules.Child'
-                                            }, function () {
-                                                this.initialize = function (cfg) {
-                                                    this.parentClass.initialize(cfg);
-                                                };
+                                        DIY.define('MYAPP.modules.GrandChild', {
+                                            extend: 'MYAPP.modules.Child'
+                                        }, function () {
+                                            this.initialize = function (cfg) {
+                                                this.parentClass.initialize(cfg);
+                                            };
 
-                                                this.getMessage = function () {
-                                                    return this.parentClass.getMessage() +
-                                                    ' called from the grandchild';
-                                                };
-                                            });
+                                            this.getMessage = function () {
+                                                return this.parentClass.getMessage() +
+                                                ' called from the grandchild';
+                                            };
+                                        });
 
-                                            instance = new MYAPP.modules.GrandChild({
-                                                attr: 'this is a GrandChild'
-                                            });
+                                        instance = new MYAPP.modules.GrandChild({
+                                            attr: 'this is a GrandChild'
+                                        });
 
-                                            expect(instance.attr).toEqual('this is a GrandChild');
-                                            expect(instance.getMessage()).toEqual(
-                                                    'this is the parent method' +
-                                                    ' called from the child' +
-                                                    ' called from the grandchild');
+                                        expect(instance.attr).toEqual('this is a GrandChild');
+                                        expect(instance.getMessage()).toEqual(
+                                                'this is the parent method' +
+                                                ' called from the child' +
+                                                ' called from the grandchild');
                                     });
                                 });
                             });
