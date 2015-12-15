@@ -268,19 +268,6 @@ var DIY = (function (window) {
         return root;
     },
 
-    inherit = function (child, Parent) {
-        var borrowedConstructor = function () {
-                Parent.apply(this, arguments);
-                child.apply(this, arguments);
-            },
-            instance = new Parent();
-
-        borrowedConstructor.prototype = instance;
-        borrowedConstructor.prototype.parentClass = instance;
-
-        return borrowedConstructor;
-    },
-
     isThereAParentConstructor = function (constructor) {
         return !!constructor;
     },
@@ -294,11 +281,30 @@ var DIY = (function (window) {
     },
 
     getSingletonObject = function (Constructor, parent) {
+        var singletonBorrowedConstructor;
+
         if (isThereAParentConstructor.call(this, parent)) {
             throw 'Inheritance for singleton objects is not supported.';
         }
 
-        return new Constructor();
+        
+        singletonBorrowedConstructor = function () {
+            var instance = singletonBorrowedConstructor.prototype.instance;
+            if (instance) {
+                return instance;
+            }
+
+            instance = new Constructor();
+            if (instance.initialize) {
+                instance.initialize.apply(instance, arguments);
+            }
+            singletonBorrowedConstructor.prototype.instance = instance;
+
+            return singletonBorrowedConstructor.prototype.instance;
+        };
+        singletonBorrowedConstructor.prototype.instance = null;
+
+        return singletonBorrowedConstructor;
     },
 
     getConstructor = function (Constructor, parent) {
@@ -309,8 +315,32 @@ var DIY = (function (window) {
                 throw 'Parent constructor should be loaded manually to inherit from it.';
             }
         } else {
-            return Constructor;
+            return getBorrowedConstructor.call(this, Constructor);
         }
+    },
+
+    getBorrowedConstructor = function (Constructor) {
+        var borrowedConstructor = function () {
+                if (!this.initialize) {
+                    throw 'Error. Class does not have initialize method';
+                }
+
+                this.initialize.apply(this, arguments);
+            };
+
+        borrowedConstructor.prototype = new Constructor();
+        return borrowedConstructor;
+    },
+
+    inherit = function (Child, Parent) {
+        var borrowedConstructor,
+            instance = new Parent();
+
+        Child.prototype = instance;
+        borrowedConstructor = getBorrowedConstructor.call(this, Child);
+        borrowedConstructor.prototype.parentClass = instance;
+
+        return borrowedConstructor;
     },
 
     /**
