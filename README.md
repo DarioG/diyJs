@@ -8,6 +8,10 @@ DiyJs is a set of tools for those javascript developers who love OOP but at the 
 
 ### Features in place:
 
+- DIY.init method -> To initialize your app
+    - Params
+        - jsPath -> Path to the place where your js modules are placed. This is used for the lazy load
+
 - Define method -> This define your namespaces. Features supported:
     - Singleton
     - Constructors
@@ -22,6 +26,19 @@ To see the documentation:
         npm install
     3. run grunt docs
         grunt doc
+
+### Use guide
+
+Before defining your modules you have to initialize the app with DIY.init(config), ie
+    - This is usually done in your app.js or in the first script which is loaded in your app.
+
+```javascript
+DIY.init({
+    jsPath: 'http://localhost/assets/js/src/' // Path to the place where your js modules are placed. This is used for the lazy load
+})
+```
+
+Then you can define your modules
 
 #### Example
 
