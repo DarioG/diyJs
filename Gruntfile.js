@@ -1,6 +1,17 @@
 module.exports = function (grunt) {
 
     grunt.initConfig({
+        markdown: {
+            all: {
+                files: [{
+                    expand: true,
+                    src: ['README.md'],
+                    dest: 'markdown/',
+                    ext: '.html'
+                }]
+            }
+        },
+
         jsdoc : {
             dist : {
                 src: ['diy/*.js'],
@@ -54,8 +65,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-markdown');
     grunt.loadNpmTasks('grunt-contrib-watch');
 
+    grunt.registerTask('mark', ['markdown']);
     grunt.registerTask('doc', ['jsdoc']);
     grunt.registerTask('dev', ['watch']);
     grunt.registerTask('qa', [
