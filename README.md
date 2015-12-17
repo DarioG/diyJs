@@ -30,11 +30,12 @@ To see the documentation:
 ### Use guide
 
 Before defining your modules you have to initialize the app with DIY.init(config), ie
-    - This is usually done in your app.js or in the first script which is loaded in your app.
+- This is usually done in your app.js or in the first script which is loaded in your app.
 
 ```javascript
 DIY.init({
-    jsPath: 'http://localhost/assets/js/src/' // Path to the place where your js modules are placed. This is used for the lazy load
+    // Path to the place where your js modules are placed. This is used for the lazy load
+    jsPath: 'http://localhost/assets/js/src/'
 })
 ```
 
