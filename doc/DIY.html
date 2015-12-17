@@ -115,8 +115,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="C__Users_dgarciamoya_workspaces_diyJs_diy_diy.js.html">C:/Users/dgarciamoya/workspaces/diyJs/diy/diy.js</a>,
-				 <a href="C__Users_dgarciamoya_workspaces_diyJs_diy_diy.js.html#sunlight-1-line-7">line 7</a>
+				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-7">line 7</a>
 			</li>
 		</ul>
 	</dd>
@@ -289,7 +289,8 @@
 
             
 
-            <td class="description last"><p>This parameter is mandatory.<br>  If you dont need inheritance, just pass null, empty string or undefined.</p></td>
+            <td class="description last"><p>This parameter is mandatory.
+  If you dont need inheritance, just pass null, empty string or undefined.</p></td>
         </tr>
 
     
@@ -313,7 +314,8 @@
 
             
 
-            <td class="description last"><p>Array with the modules which are required.<br>  If you dont need dependencies, just pass an empty array</p></td>
+            <td class="description last"><p>Array with the modules which are required.
+  If you dont need dependencies, just pass an empty array</p></td>
         </tr>
 
     
@@ -388,8 +390,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="C__Users_dgarciamoya_workspaces_diyJs_diy_diy.js.html">C:/Users/dgarciamoya/workspaces/diyJs/diy/diy.js</a>,
-				 <a href="C__Users_dgarciamoya_workspaces_diyJs_diy_diy.js.html#sunlight-1-line-213">line 213</a>
+				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-277">line 277</a>
 			</li>
 		</ul>
 	</dd>
@@ -420,35 +422,43 @@
         
         <p class="code-caption">The regular way to define a constructor would be:</p>
     
-    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MyNameSpace&#x27;, {}, function () {      var myPrivatevar = 1;      this.myPublicMethod = function () {          return myPrivatevar;      }:  });</pre>
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.MyNameSpace&#x27;, {}, function () {      var myPrivatevar;      this.initialize = function () {          myPrivatevar = 1;      };      this.myPublicMethod = function () {          return myPrivatevar;      };  });</pre>
 
-        <p class="code-caption">If the constructor has some dependencies:</p>
+        <p class="code-caption">you should always initialize you class with the initialize method and  not directly in the constructor, ie: </p>
     
-    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MyNameSpace&#x27;, {      requires: [          &#x27;MYAPP.module.myModuleNeeded1&#x27;,          &#x27;MYAPP.module.myModuleNeeded2&#x27;      ]  }, function () {      var myPrivatevar = 1;      this.myPublicMethod = function () {          return myPrivatevar;      };  });</pre>
+    <pre class="sunlight-highlight-javascript">  // Very bad. Init config objec should not be passed here  DIY.define(&#x27;MYAPP.MyNameSpace&#x27;, {}, function (cfg) {      var myPrivatevar = 1;  // Bad      // Good. You should pass you config object into the initialize method      this.initialize = function (cfg) {          myPrivatevar = 1; // Good      };      this.myPublicMethod = function () {          return myPrivatevar;      }:  });</pre>
+
+        <p class="code-caption">initialize method is mandatory, unless your class inherits from a class  which already has the initilize method, then the child class will be initialized with  the parent initialize method. <br />  This is private and it should not be called from outside. It is there for initialize  purposes only.</br></br></br>  If the constructor has some dependencies:</p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.MyNameSpace&#x27;, {      requires: [          &#x27;MYAPP.module.myModuleNeeded1&#x27;,          &#x27;MYAPP.module.myModuleNeeded2&#x27;      ]  }, function () {      var myPrivatevar;      this.initialize = function () {          myPrivatevar = 1;      };  });</pre>
 
         <p class="code-caption">This will load the dependencies, if not yet loaded, asyncronously </br></br></br>  If the constructor inherits from anyone else:</p>
     
-    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      var myPrivatevar = 1;      this.myPublicMethod = function () {          return myPrivatevar;      };  });</pre>
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      var myPrivatevar;      this.initialize = function () {          myPrivatevar = 1;      };  });</pre>
 
         <p class="code-caption">This will add one instance of "ParentModule" to the prototype of MyNameSpace </br>NOTE: In this version the parent namespace should be already loaded. There not load lazy loading implemented for parent constructors </br></br></br>Parent constructor will be initialized with the arguments passed in to the child constructor,as it is supposed to be, i.e</p>
     
-    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;ParentModule&#x27;, {}, function (cfg) {      var myPrivatevar = cfg.private;  });  DIY.define(&#x27;MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      this.myPublicMethod = function () {          return myPrivatevar;      };  });  var myChildInstance = MyNameSpace({      private: &#x27;foo&#x27;  });  myChildInstance.myPublicMethod(); // this will return &#x27;foo&#x27;</pre>
+    <pre class="sunlight-highlight-javascript"> DIY.define(&#x27;MYAPP.module.ParentModule&#x27;, {}, function () {     this.myParentVar;     this.initialize = function (cfg) {         this.myParentVar = cfg.private;     }; }); DIY.define(&#x27;MYAPP.module.MyNameSpace&#x27;, {     extend: &#x27;MYAPP.module.ParentModule&#x27; }, function () {     this.myPublicMethod = function () {         return this.myParentVar;     }; }); var myChildInstance = new MYAPP.module.MyNameSpace({     private: &#x27;foo&#x27; }); myChildInstance.myPublicMethod();</pre>
 
         <p class="code-caption">  Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.</p>
     
-    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;ParentModule&#x27;, {}, function (cfg) {      var myPrivatevar = cfg.private;      this.myPublicMethod = function () {          return myPrivatevar;      };  });  DIY.define(&#x27;MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      this.myPublicMethod = function () {          return this.parentClass.myPublicMethod() + &#x27; and bar&#x27;;      };  });  var myChildInstance = MyNameSpace({      private: &#x27;foo&#x27;  });  myChildInstance.myPublicMethod(); // this will return &#x27;foo and bar&#x27;</pre>
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.module.ParentModule&#x27;, {}, function () {      var myPrivatevar;      this.initialize = function (cfg) {          myPrivatevar = cfg.private;      };      this.myPublicMethod = function () {          return myPrivatevar;      };  });  DIY.define(&#x27;MYAPP.module.MyNameSpace&#x27;, {      extend: &#x27;MYAPP.module.ParentModule&#x27;  }, function () {      this.myPublicMethod = function () {          return this.parentClass.myPublicMethod() + &#x27; and bar&#x27;;      };  });  var myChildInstance = new MYAPP.module.MyNameSpace({      private: &#x27;foo&#x27;  });  myChildInstance.myPublicMethod(); // this will return &#x27;foo and bar&#x27;</pre>
 
         <p class="code-caption">You can also define a singleton class, i.e.</p>
     
-    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;singletonClass&#x27;, {      singleton: true  }, function () {      this.myPublicMethod = function () {          return &#x27;my singleton object&#x27;;      };  });</pre>
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.singletonClass&#x27;, {      singleton: true  }, function () {      this.myPublicMethod = function () {          return &#x27;my singleton object&#x27;;      };  });</pre>
 
-        <p class="code-caption">then you will be able to access to the public methods directly like this</p>
+        <p class="code-caption">then you will be able to access to the public methods like this</p>
     
-    <pre class="sunlight-highlight-javascript"> singletonClass.myPublicMethod(); // this will return &#x27;my singleton object&#x27;</pre>
+    <pre class="sunlight-highlight-javascript"> var mySingletonInstance = new MYAPP.singletonClass(); mySingletonInstance.myPublicMethod(); // this will return &#x27;my singleton object&#x27;</pre>
 
-        <p class="code-caption">  otherwise if you try to instanciate again with new, it will throw an exception</p>
+        <p class="code-caption">Remember that it will only create the instance the first time you call it. The following times it will return the same instance. </p>
     
-    <pre class="sunlight-highlight-javascript"> var myNewInstance = new singletonClass(); // This will throw</pre>
+    <pre class="sunlight-highlight-javascript"> var mySingletonInstance = new MYAPP.singletonClass(); var mySingletonInstance2 = new MYAPP.singletonClass(); mySingletonInstance === mySingletonInstance2; // true</pre>
+
+        <p class="code-caption"> You can add a initialize method to a singleton class if you want.  This is not mandatory but this is usefull when you want to initialize a singleton  class or pass dependencies. </p>
+    
+    <pre class="sunlight-highlight-javascript">  DIY.define(&#x27;MYAPP.singletonClass&#x27;, {      singleton: true  }, function () {      var dependency;      this.initialize = function (cfg) {          dependency = cfg.dependency;      };      this.myPublicMethod = function () {          return dependency;      };  });  var mySingletonInstance = new MYAPP.singletonClass({      dependency: &#x27;hey&#x27;  });  mySingletonInstance.myPublicMethod();// hey</pre>
 
 
     
@@ -466,7 +476,8 @@
 
     
     <div class="description">
-        <p>You need to call this method at the beggining of you app with the proper config object<br>  otherwise you wont be able to use the framework.</p>
+        <p>You need to call this method at the beggining of you app with the proper config object
+  otherwise you wont be able to use the framework.</p>
     </div>
     
 
@@ -615,8 +626,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="C__Users_dgarciamoya_workspaces_diyJs_diy_diy.js.html">C:/Users/dgarciamoya/workspaces/diyJs/diy/diy.js</a>,
-				 <a href="C__Users_dgarciamoya_workspaces_diyJs_diy_diy.js.html#sunlight-1-line-326">line 326</a>
+				<a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html">C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</a>,
+				 <a href="C__Users_Dario%20Garcia%20Moya_Projects_diyJs_diy_diy.js.html#sunlight-1-line-429">line 429</a>
 			</li>
 		</ul>
 	</dd>
@@ -695,7 +706,7 @@
 	</span>
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a>
 	on Thu Dec 17th 2015 using the <a
 	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

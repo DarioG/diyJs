@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>DiyJs Source: C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</title>
+	<title>DocStrap Source: C:/Users/Dario Garcia Moya/Projects/diyJs/diy/diy.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -19,9 +19,14 @@
 <div class="navbar navbar-default navbar-fixed-top navbar-inverse">
 <div class="container">
 	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">DiyJs</a>
+		<a class="navbar-brand" href="index.html">DocStrap</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
 	</div>
-	<div class="navbar-collapse">
+	<div class="navbar-collapse collapse" id="topNavigation">
 		<ul class="nav navbar-nav">
 			
 			<li class="dropdown">
@@ -32,12 +37,23 @@
 			</li>
 			
 		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
 	</div>
+
 </div>
 </div>
 
 
-<div class="container">
+<div class="container" id="toc-content">
 <div class="row">
 
 	
@@ -131,26 +147,53 @@ var DIY = (function (window) {
     * @example
     * &lt;caption>The regular way to define a constructor would be:&lt;/caption>
     *
-    *   DIY.define('MyNameSpace', {}, function () {
-    *       var myPrivatevar = 1;
+    *   DIY.define('MYAPP.MyNameSpace', {}, function () {
+    *       var myPrivatevar;
+    *
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
+    *       };
+    *
+    *       this.myPublicMethod = function () {
+    *           return myPrivatevar;
+    *       };
+    *   });
+    * @example
+    * &lt;caption>you should always initialize you class with the initialize method and
+    *   not directly in the constructor, ie: &lt;/caption>
+    *
+    *   // Very bad. Init config objec should not be passed here
+    *   DIY.define('MYAPP.MyNameSpace', {}, function (cfg) {
+    *       var myPrivatevar = 1;  // Bad
+    *
+    *       // Good. You should pass you config object into the initialize method
+    *       this.initialize = function (cfg) {
+    *           myPrivatevar = 1; // Good
+    *       };
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
     *       }:
     *   });
     * @example
-    * &lt;caption>If the constructor has some dependencies:&lt;/caption>
+    * &lt;caption>initialize method is mandatory, unless your class inherits from a class
+    *   which already has the initilize method, then the child class will be initialized with
+    *   the parent initialize method. &lt;br />
+    *   This is private and it should not be called from outside. It is there for initialize
+    *   purposes only.&lt;/br>&lt;/br>&lt;/br>
     *
-    *   DIY.define('MyNameSpace', {
+    *   If the constructor has some dependencies:&lt;/caption>
+    *
+    *   DIY.define('MYAPP.MyNameSpace', {
     *       requires: [
     *           'MYAPP.module.myModuleNeeded1',
     *           'MYAPP.module.myModuleNeeded2'
     *       ]
     *   }, function () {
-    *       var myPrivatevar = 1;
+    *       var myPrivatevar;
     *
-    *       this.myPublicMethod = function () {
-    *           return myPrivatevar;
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
     *       };
     *   });
     *
@@ -162,13 +205,13 @@ var DIY = (function (window) {
     *   If the constructor inherits from anyone else:
     * &lt;/caption>
     *
-    *   DIY.define('MyNameSpace', {
+    *   DIY.define('MYAPP.MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
-    *       var myPrivatevar = 1;
+    *       var myPrivatevar;
     *
-    *       this.myPublicMethod = function () {
-    *           return myPrivatevar;
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
     *       };
     *   });
     *
@@ -181,40 +224,48 @@ var DIY = (function (window) {
     * as it is supposed to be, i.e
     * &lt;/caption>
     *
-    *   DIY.define('ParentModule', {}, function (cfg) {
-    *       var myPrivatevar = cfg.private;
-    *   });
+    *  DIY.define('MYAPP.module.ParentModule', {}, function () {
+    *      this.myParentVar;
     *
-    *   DIY.define('MyNameSpace', {
-    *       extend: 'MYAPP.module.ParentModule'
-    *   }, function () {
-    *       this.myPublicMethod = function () {
-    *           return myPrivatevar;
-    *       };
-    *   });
+    *      this.initialize = function (cfg) {
+    *          this.myParentVar = cfg.private;
+    *      };
+    *  });
+    *
+    *  DIY.define('MYAPP.module.MyNameSpace', {
+    *      extend: 'MYAPP.module.ParentModule'
+    *  }, function () {
+    *      this.myPublicMethod = function () {
+    *          return this.myParentVar;
+    *      };
+    *  });
     *
     *
-    *   var myChildInstance = MyNameSpace({
-    *       private: 'foo'
-    *   });
+    *  var myChildInstance = new MYAPP.module.MyNameSpace({
+    *      private: 'foo'
+    *  });
     *
     *
-    *   myChildInstance.myPublicMethod(); // this will return 'foo'
+    *  myChildInstance.myPublicMethod();
     *
     * @example
     * &lt;caption>
     *   Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.
     * &lt;/caption>
     *
-    *   DIY.define('ParentModule', {}, function (cfg) {
-    *       var myPrivatevar = cfg.private;
+    *   DIY.define('MYAPP.module.ParentModule', {}, function () {
+    *       var myPrivatevar;
+    *
+    *       this.initialize = function (cfg) {
+    *           myPrivatevar = cfg.private;
+    *       };
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
     *       };
     *   });
     *
-    *   DIY.define('MyNameSpace', {
+    *   DIY.define('MYAPP.module.MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
     *       this.myPublicMethod = function () {
@@ -223,7 +274,7 @@ var DIY = (function (window) {
     *   });
     *
     *
-    *   var myChildInstance = MyNameSpace({
+    *   var myChildInstance = new MYAPP.module.MyNameSpace({
     *       private: 'foo'
     *   });
     *
@@ -234,7 +285,7 @@ var DIY = (function (window) {
     * @example
     * &lt;caption>You can also define a singleton class, i.e.&lt;/caption>
     *
-    *   DIY.define('singletonClass', {
+    *   DIY.define('MYAPP.singletonClass', {
     *       singleton: true
     *   }, function () {
     *       this.myPublicMethod = function () {
@@ -243,16 +294,45 @@ var DIY = (function (window) {
     *   });
     *
     * @example
-    * &lt;caption>then you will be able to access to the public methods directly like this&lt;/caption>
+    * &lt;caption>then you will be able to access to the public methods like this&lt;/caption>
     *
-    *  singletonClass.myPublicMethod(); // this will return 'my singleton object'
-    * 
+    *  var mySingletonInstance = new MYAPP.singletonClass();
+    *  mySingletonInstance.myPublicMethod(); // this will return 'my singleton object'
+    *
     * @example
-    * &lt;caption>
-    *   otherwise if you try to instanciate again with new, it will throw an exception
-    * &lt;/caption>
+    * &lt;caption>Remember that it will only create the instance the first time you call it.
+    *  The following times it will return the same instance.
+    *  &lt;/caption>
     *
-    *  var myNewInstance = new singletonClass(); // This will throw
+    *  var mySingletonInstance = new MYAPP.singletonClass();
+    *  var mySingletonInstance2 = new MYAPP.singletonClass();
+    *  mySingletonInstance === mySingletonInstance2; // true
+    *
+    * @example
+    * &lt;caption> You can add a initialize method to a singleton class if you want.
+    *   This is not mandatory but this is usefull when you want to initialize a singleton
+    *   class or pass dependencies.
+    *  &lt;/caption>
+    *
+    *   DIY.define('MYAPP.singletonClass', {
+    *       singleton: true
+    *   }, function () {
+    *       var dependency;
+    *
+    *       this.initialize = function (cfg) {
+    *           dependency = cfg.dependency;
+    *       };
+
+    *       this.myPublicMethod = function () {
+    *           return dependency;
+    *       };
+    *   });
+    *
+    *   var mySingletonInstance = new MYAPP.singletonClass({
+    *       dependency: 'hey'
+    *   });
+    *
+    *   mySingletonInstance.myPublicMethod();// hey
     *
     * @param {String} namespace
     * @param {Object} config Some configurations for the definition of the constructor
@@ -321,19 +401,6 @@ var DIY = (function (window) {
         return root;
     },
 
-    inherit = function (child, Parent) {
-        var borrowedConstructor = function () {
-                Parent.apply(this, arguments);
-                child.apply(this, arguments);
-            },
-            instance = new Parent();
-
-        borrowedConstructor.prototype = instance;
-        borrowedConstructor.prototype.parentClass = instance;
-
-        return borrowedConstructor;
-    },
-
     isThereAParentConstructor = function (constructor) {
         return !!constructor;
     },
@@ -347,11 +414,28 @@ var DIY = (function (window) {
     },
 
     getSingletonObject = function (Constructor, parent) {
+        var singletonBorrowedConstructor;
+
         if (isThereAParentConstructor.call(this, parent)) {
             throw 'Inheritance for singleton objects is not supported.';
         }
 
-        return new Constructor();
+        singletonBorrowedConstructor = function () {
+            var instance = singletonBorrowedConstructor.prototype.instance;
+            if (instance) {
+                return instance;
+            }
+
+            instance = new Constructor();
+            if (instance.initialize) {
+                instance.initialize.apply(instance, arguments);
+            }
+            singletonBorrowedConstructor.prototype.instance = instance;
+
+            return singletonBorrowedConstructor.prototype.instance;
+        };
+
+        return singletonBorrowedConstructor;
     },
 
     getConstructor = function (Constructor, parent) {
@@ -362,8 +446,43 @@ var DIY = (function (window) {
                 throw 'Parent constructor should be loaded manually to inherit from it.';
             }
         } else {
-            return Constructor;
+            return getBorrowedConstructor.call(this, Constructor);
         }
+    },
+
+    shouldInitialize = function (config) {
+        return !config || !config.__notInitialize;
+    },
+
+    getBorrowedConstructor = function (Constructor) {
+        var borrowedConstructor = function () {
+                if (!this.initialize) {
+                    throw 'Error. Class does not have initialize method';
+                }
+
+                // when this constructor is called from the inherits method, 
+                // initialize method should not be called, since the constructor
+                // is nt being initialized yet.
+                if (shouldInitialize.call(this, arguments[0])) {
+                    this.initialize.apply(this, arguments);
+                }
+            };
+
+        borrowedConstructor.prototype = new Constructor();
+        return borrowedConstructor;
+    },
+
+    inherit = function (Child, Parent) {
+        var borrowedConstructor,
+            instance = new Parent({
+                __notInitialize: true
+            });
+
+        Child.prototype = instance;
+        borrowedConstructor = getBorrowedConstructor.call(this, Child);
+        borrowedConstructor.prototype.parentClass = instance;
+
+        return borrowedConstructor;
     },
 
     /**
@@ -407,25 +526,38 @@ var DIY = (function (window) {
 </div>
 </div>
 
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
 
 <footer>
 
 
 	<span class="copyright">
-	DocStrap Copyright © 2012-2014 The contributors to the JSDoc3 and DocStrap projects.
+	DocStrap Copyright © 2012-2015 The contributors to the JSDoc3 and DocStrap projects.
 	</span>
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a>
-	on Wed Dec 9th 2015 using the <a
+	on Thu Dec 17th 2015 using the <a
 	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
 </footer>
 
-<!--<script src="scripts/sunlight.js"></script>-->
 <script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/bootstrap-dropdown.js"></script>
 <script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
 
 <script>
 $( function () {
@@ -446,7 +578,8 @@ $( function () {
 			example.html( exampleText );
 			lang = lang[1];
 		} else {
-			lang = "javascript";
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
 		}
 
 		if ( lang ) {
@@ -465,22 +598,26 @@ $( function () {
 		enableDoclinks : true
 	} );
 
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
 			var id = $( heading ).attr( "id" );
 			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
-		selectors   : "h1,h2,h3,h4",
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
 		showAndHide : false,
-                navbarOffset: 10,
 		smoothScrolling: true
 	} );
 
-	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
 	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
 	$( '.dropdown-toggle' ).dropdown();
-	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
 
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
 
 } );
 </script>
@@ -492,6 +629,12 @@ $( function () {
 
 <!--Google Analytics-->
 
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
 
 </body>
 </html>

@@ -78,26 +78,53 @@ var DIY = (function (window) {
     * @example
     * <caption>The regular way to define a constructor would be:</caption>
     *
-    *   DIY.define('MyNameSpace', {}, function () {
-    *       var myPrivatevar = 1;
+    *   DIY.define('MYAPP.MyNameSpace', {}, function () {
+    *       var myPrivatevar;
+    *
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
+    *       };
+    *
+    *       this.myPublicMethod = function () {
+    *           return myPrivatevar;
+    *       };
+    *   });
+    * @example
+    * <caption>you should always initialize you class with the initialize method and
+    *   not directly in the constructor, ie: </caption>
+    *
+    *   // Very bad. Init config objec should not be passed here
+    *   DIY.define('MYAPP.MyNameSpace', {}, function (cfg) {
+    *       var myPrivatevar = 1;  // Bad
+    *
+    *       // Good. You should pass you config object into the initialize method
+    *       this.initialize = function (cfg) {
+    *           myPrivatevar = 1; // Good
+    *       };
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
     *       }:
     *   });
     * @example
-    * <caption>If the constructor has some dependencies:</caption>
+    * <caption>initialize method is mandatory, unless your class inherits from a class
+    *   which already has the initilize method, then the child class will be initialized with
+    *   the parent initialize method. <br />
+    *   This is private and it should not be called from outside. It is there for initialize
+    *   purposes only.</br></br></br>
     *
-    *   DIY.define('MyNameSpace', {
+    *   If the constructor has some dependencies:</caption>
+    *
+    *   DIY.define('MYAPP.MyNameSpace', {
     *       requires: [
     *           'MYAPP.module.myModuleNeeded1',
     *           'MYAPP.module.myModuleNeeded2'
     *       ]
     *   }, function () {
-    *       var myPrivatevar = 1;
+    *       var myPrivatevar;
     *
-    *       this.myPublicMethod = function () {
-    *           return myPrivatevar;
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
     *       };
     *   });
     *
@@ -109,13 +136,13 @@ var DIY = (function (window) {
     *   If the constructor inherits from anyone else:
     * </caption>
     *
-    *   DIY.define('MyNameSpace', {
+    *   DIY.define('MYAPP.MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
-    *       var myPrivatevar = 1;
+    *       var myPrivatevar;
     *
-    *       this.myPublicMethod = function () {
-    *           return myPrivatevar;
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
     *       };
     *   });
     *
@@ -128,40 +155,48 @@ var DIY = (function (window) {
     * as it is supposed to be, i.e
     * </caption>
     *
-    *   DIY.define('ParentModule', {}, function (cfg) {
-    *       var myPrivatevar = cfg.private;
-    *   });
+    *  DIY.define('MYAPP.module.ParentModule', {}, function () {
+    *      this.myParentVar;
     *
-    *   DIY.define('MyNameSpace', {
-    *       extend: 'MYAPP.module.ParentModule'
-    *   }, function () {
-    *       this.myPublicMethod = function () {
-    *           return myPrivatevar;
-    *       };
-    *   });
+    *      this.initialize = function (cfg) {
+    *          this.myParentVar = cfg.private;
+    *      };
+    *  });
+    *
+    *  DIY.define('MYAPP.module.MyNameSpace', {
+    *      extend: 'MYAPP.module.ParentModule'
+    *  }, function () {
+    *      this.myPublicMethod = function () {
+    *          return this.myParentVar;
+    *      };
+    *  });
     *
     *
-    *   var myChildInstance = MyNameSpace({
-    *       private: 'foo'
-    *   });
+    *  var myChildInstance = new MYAPP.module.MyNameSpace({
+    *      private: 'foo'
+    *  });
     *
     *
-    *   myChildInstance.myPublicMethod(); // this will return 'foo'
+    *  myChildInstance.myPublicMethod();
     *
     * @example
     * <caption>
     *   Polymorphism ist allowed, you just have to call this.parentClass.methodName(), i.e.
     * </caption>
     *
-    *   DIY.define('ParentModule', {}, function (cfg) {
-    *       var myPrivatevar = cfg.private;
+    *   DIY.define('MYAPP.module.ParentModule', {}, function () {
+    *       var myPrivatevar;
+    *
+    *       this.initialize = function (cfg) {
+    *           myPrivatevar = cfg.private;
+    *       };
     *
     *       this.myPublicMethod = function () {
     *           return myPrivatevar;
     *       };
     *   });
     *
-    *   DIY.define('MyNameSpace', {
+    *   DIY.define('MYAPP.module.MyNameSpace', {
     *       extend: 'MYAPP.module.ParentModule'
     *   }, function () {
     *       this.myPublicMethod = function () {
@@ -170,7 +205,7 @@ var DIY = (function (window) {
     *   });
     *
     *
-    *   var myChildInstance = MyNameSpace({
+    *   var myChildInstance = new MYAPP.module.MyNameSpace({
     *       private: 'foo'
     *   });
     *
@@ -181,7 +216,7 @@ var DIY = (function (window) {
     * @example
     * <caption>You can also define a singleton class, i.e.</caption>
     *
-    *   DIY.define('singletonClass', {
+    *   DIY.define('MYAPP.singletonClass', {
     *       singleton: true
     *   }, function () {
     *       this.myPublicMethod = function () {
@@ -190,16 +225,45 @@ var DIY = (function (window) {
     *   });
     *
     * @example
-    * <caption>then you will be able to access to the public methods directly like this</caption>
+    * <caption>then you will be able to access to the public methods like this</caption>
     *
-    *  singletonClass.myPublicMethod(); // this will return 'my singleton object'
+    *  var mySingletonInstance = new MYAPP.singletonClass();
+    *  mySingletonInstance.myPublicMethod(); // this will return 'my singleton object'
     *
     * @example
-    * <caption>
-    *   otherwise if you try to instanciate again with new, it will throw an exception
-    * </caption>
+    * <caption>Remember that it will only create the instance the first time you call it.
+    *  The following times it will return the same instance.
+    *  </caption>
     *
-    *  var myNewInstance = new singletonClass(); // This will throw
+    *  var mySingletonInstance = new MYAPP.singletonClass();
+    *  var mySingletonInstance2 = new MYAPP.singletonClass();
+    *  mySingletonInstance === mySingletonInstance2; // true
+    *
+    * @example
+    * <caption> You can add a initialize method to a singleton class if you want.
+    *   This is not mandatory but this is usefull when you want to initialize a singleton
+    *   class or pass dependencies.
+    *  </caption>
+    *
+    *   DIY.define('MYAPP.singletonClass', {
+    *       singleton: true
+    *   }, function () {
+    *       var dependency;
+    *
+    *       this.initialize = function (cfg) {
+    *           dependency = cfg.dependency;
+    *       };
+
+    *       this.myPublicMethod = function () {
+    *           return dependency;
+    *       };
+    *   });
+    *
+    *   var mySingletonInstance = new MYAPP.singletonClass({
+    *       dependency: 'hey'
+    *   });
+    *
+    *   mySingletonInstance.myPublicMethod();// hey
     *
     * @param {String} namespace
     * @param {Object} config Some configurations for the definition of the constructor
@@ -268,19 +332,6 @@ var DIY = (function (window) {
         return root;
     },
 
-    inherit = function (child, Parent) {
-        var borrowedConstructor = function () {
-                Parent.apply(this, arguments);
-                child.apply(this, arguments);
-            },
-            instance = new Parent();
-
-        borrowedConstructor.prototype = instance;
-        borrowedConstructor.prototype.parentClass = instance;
-
-        return borrowedConstructor;
-    },
-
     isThereAParentConstructor = function (constructor) {
         return !!constructor;
     },
@@ -294,11 +345,28 @@ var DIY = (function (window) {
     },
 
     getSingletonObject = function (Constructor, parent) {
+        var singletonBorrowedConstructor;
+
         if (isThereAParentConstructor.call(this, parent)) {
             throw 'Inheritance for singleton objects is not supported.';
         }
 
-        return new Constructor();
+        singletonBorrowedConstructor = function () {
+            var instance = singletonBorrowedConstructor.prototype.instance;
+            if (instance) {
+                return instance;
+            }
+
+            instance = new Constructor();
+            if (instance.initialize) {
+                instance.initialize.apply(instance, arguments);
+            }
+            singletonBorrowedConstructor.prototype.instance = instance;
+
+            return singletonBorrowedConstructor.prototype.instance;
+        };
+
+        return singletonBorrowedConstructor;
     },
 
     getConstructor = function (Constructor, parent) {
@@ -309,8 +377,43 @@ var DIY = (function (window) {
                 throw 'Parent constructor should be loaded manually to inherit from it.';
             }
         } else {
-            return Constructor;
+            return getBorrowedConstructor.call(this, Constructor);
         }
+    },
+
+    shouldInitialize = function (config) {
+        return !config || !config.__notInitialize;
+    },
+
+    getBorrowedConstructor = function (Constructor) {
+        var borrowedConstructor = function () {
+                if (!this.initialize) {
+                    throw 'Error. Class does not have initialize method';
+                }
+
+                // when this constructor is called from the inherits method, 
+                // initialize method should not be called, since the constructor
+                // is nt being initialized yet.
+                if (shouldInitialize.call(this, arguments[0])) {
+                    this.initialize.apply(this, arguments);
+                }
+            };
+
+        borrowedConstructor.prototype = new Constructor();
+        return borrowedConstructor;
+    },
+
+    inherit = function (Child, Parent) {
+        var borrowedConstructor,
+            instance = new Parent({
+                __notInitialize: true
+            });
+
+        Child.prototype = instance;
+        borrowedConstructor = getBorrowedConstructor.call(this, Child);
+        borrowedConstructor.prototype.parentClass = instance;
+
+        return borrowedConstructor;
     },
 
     /**

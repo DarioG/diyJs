@@ -58,6 +58,11 @@ module.exports = function (grunt) {
                     'jshint',
                     'jscs'
                 ]
+            },
+
+            mark: {
+                files: ['README.md'],
+                tasks: ['markdown']
             }
         }
     });
