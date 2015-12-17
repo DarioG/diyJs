@@ -15,6 +15,14 @@ DiyJs is a set of tools for those javascript developers who love OOP but at the 
     - Polymorphism
     - Lazy load of dependencies
 
+To see the documentation:
+
+    1. Clone the repo
+    2. Install npm dependencies
+        npm install
+    3. run grunt docs
+        grunt doc
+
 #### Example
 
 ```javascript
