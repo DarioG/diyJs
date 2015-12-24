@@ -113,7 +113,31 @@ var DIY = (function (window) {
     *   This is private and it should not be called from outside. It is there for initialize
     *   purposes only.</br></br></br>
     *
-    *   If the constructor has some dependencies:</caption>
+    *
+    *   NOTE: You should start always for your defined NAMESPACE, but you never should add any logic
+    *   to the namespace root, i.e.</caption>
+    *
+    *   // This is wrong and it won´t work
+    *   DIY.define('MYAPP', {}, function () {
+    *       var myPrivatevar;
+    *
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
+    *       };
+    *   });
+    *
+    *   // This is ok
+    *   DIY.define('MYAPP.module', {}, function () {
+    *       var myPrivatevar;
+    *
+    *       this.initialize = function () {
+    *           myPrivatevar = 1;
+    *       };
+    *   });
+    *
+    *
+    * @example
+    * <caption> If the constructor has some dependencies:</caption>
     *
     *   DIY.define('MYAPP.MyNameSpace', {
     *       requires: [
@@ -391,9 +415,9 @@ var DIY = (function (window) {
                     throw 'Error. Class does not have initialize method';
                 }
 
-                // when this constructor is called from the inherits method, 
+                // when this constructor is called from the inherits method,
                 // initialize method should not be called, since the constructor
-                // is nt being initialized yet.
+                // is not being initialized yet.
                 if (shouldInitialize.call(this, arguments[0])) {
                     this.initialize.apply(this, arguments);
                 }
