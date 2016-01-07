@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>DocStrap Index</title>
+	<title>DocStrap Source: array.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -64,32 +64,83 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	
-	
+		<h1 class="page-title">Source: array.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">/**
+* Singleton
+* @class DIY.Array
+*/
+DIY.define('DIY.Array', {
+    singleton: true
+}, function () {
+    var isIterable = function (collection) {
+            var length = collection.length;
 
+            return length === 0 || !!collection.length;
+        },
 
+    isIterableOrThrowError = function (collection) {
+        if (!isIterable(collection)) {
+            throw 'Wrong collections passed in. ' +
+                'Please if you want to iterate through an object, ' +
+                'please use GP.utils.Object.forEach';
+        }
+    },
 
+    nativeForEach = function (collection, callback, scope) {
+        isIterableOrThrowError(collection);
 
+        Array.prototype.forEach.call(collection, function (value, key) {
+            callback.call(scope, value, key, collection);
+        });
+    },
 
+    forEach = function (collection, callback, scope) {
+        var length,
+            i;
 
+        isIterableOrThrowError(collection);
 
+        length = collection.length;
 
+        for (i = 0; i &lt; length; i++) {
+            callback.call(scope, collection[i], i, collection);
+        }
+    };
 
+    /**
+    * @param {Array|HTMLCollections} collection
+    * @param {DIY.Array~callback} callback
+    * @param {Object} scope
+    * @memberof DIY.Array
+    */
+    this.forEach = function (collection, callback, scope) {
+        if (Array.prototype.forEach) {
+            this.forEach = nativeForEach;
+        } else {
+            this.forEach = forEach;
+        }
 
-
-	
-	
-
-
-
-
-
-
+        this.forEach(collection, callback, scope);
+    };
+});
+/**
+ * @callback DIY.Array~callback
+ * @param {Whatever} currentValue
+ * @param {Number} index
+ * @param {Array} array
+ */
+</pre>
+    </article>
+</section>
 
 
 
@@ -100,10 +151,6 @@
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>
