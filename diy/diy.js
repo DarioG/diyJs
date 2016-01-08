@@ -295,6 +295,7 @@ var DIY = (function (window) {
     *   If you dont need inheritance, just pass null, empty string or undefined.
     * @param {Array} config.requires. Array with the modules which are required.
     *   If you dont need dependencies, just pass an empty array
+    * @param {Boolean} config.singleton.
     * @param {Function} body. Constructor code
     * @memberof DIY
     */
